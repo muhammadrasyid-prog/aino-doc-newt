@@ -1,0 +1,13 @@
+[
+  {
+    "tour_name": "Dashboard Tour",
+    "page_url": "/dashboard",
+    "page_name": "Dashboard Page",
+    "step_order": 1,
+    "element_id": "",
+    "title": "formListITCM",
+    "content": "This is a sample content for the tour step.",
+    "placement": "top",
+    "buttons": "Next, Back, Cancel, Finish"
+  }
+]

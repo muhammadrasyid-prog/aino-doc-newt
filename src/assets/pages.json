@@ -1,0 +1,23 @@
+{
+    "pages": [
+      {
+        "tour_name": "Dashboard Tour",
+        "page_name": "Dashboard",
+        "page_url": "/dashboard",
+        "element_ids": ["formListITCM", "formListDA", "formListBA", "formListHA"]
+      },
+      {
+        "tour_name": "Profile Tour",
+        "page_name": "Profile",
+        "page_url": "profile",
+        "element_ids": ["element3", "element4"]
+      },
+      {
+        "tour_name": "Setting Tour",
+        "page_name": "Settings",
+        "page_url": "settings",
+        "element_ids": ["settings1", "settings2"]
+      }
+    ]
+  }
+  

@@ -1,0 +1,8 @@
+{
+    "buttons": [
+      { "text": "Next", "action": "next" },
+      { "text": "Back", "action": "back" },
+      { "text": "Cancel", "action": "cancel" },
+      { "text": "Finish", "action": "finish" }
+    ]
+  }

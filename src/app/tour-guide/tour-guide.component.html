@@ -1,0 +1,154 @@
+<div class="container mx-auto p-6">
+    <!-- Button to open the Add Tour modal -->
+    <button class="bg-blue-500 text-white px-4 py-2 rounded shadow-md hover:bg-blue-600" (click)="openModalAdd()">Add New Tour</button>
+  
+    <!-- List of Tours -->
+    <div class="tour-list mt-6">
+      <h2 id="listTour" class="text-xl font-semibold mb-4 text-center">Tour List</h2>
+      <table class="table-auto w-full text-left border-collapse border border-gray-200">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="p-3 border border-gray-300">No.</th>
+            <th class="p-3 border border-gray-300">Tour Name</th>
+            <th class="p-3 border border-gray-300">Page Name</th>
+            <th class="p-3 border border-gray-300">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tour of dataListTour; let i = index" class="hover:bg-gray-100">
+            <td class="p-3 border border-gray-300">{{ i + 1 }}</td>
+            <td class="p-3 border border-gray-300">{{ tour.tour_name }}</td>
+            <td class="p-3 border border-gray-300">{{ tour.page_name }}</td>
+            <td class="p-3 border border-gray-300">
+              <button class="bg-blue-500 text-white px-3 py-1 rounded shadow-md hover:bg-blue-600" (click)="openEditModal(tour.tour_uuid)">Edit</button>
+              <!-- <button class="bg-gray-500 text-white px-3 py-1 rounded shadow-md hover:bg-gray-600" (click)="startTour()">Aktifkan Tour</button>
+              <button class="bg-gray-500 text-white px-3 py-1 rounded shadow-md hover:bg-gray-600" (click)="disableTour()">Nonaktifkan Tour</button> -->
+              <button class="bg-blue-500 text-white px-3 py-1 rounded shadow-md hover:bg-blue-600" (click)="onDeleteTour(tour.tour_uuid)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- Modal for Adding New Tour -->
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50" *ngIf="isModalAddOpen">
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 overflow-y-auto max-h-screen">
+        <div class="modal-header flex justify-between items-center mb-4">
+          <h5 class="text-lg font-bold">Add New Tour</h5>
+          <button type="button" class="text-gray-400 hover:text-gray-600 text-2xl font-bold" (click)="closeModalAdd()">✖</button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="addTour()">
+            <div class="mb-4">
+              <label for="tourName" class="block text-sm font-medium text-gray-700">Tour Name</label>
+              <input type="text" id="tourName" [(ngModel)]="tour_name" name="tour_name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+            <div class="mb-4">
+              <label for="pageName" class="block text-sm font-medium text-gray-700">Page Name</label>
+              <input type="text" id="pageName" [(ngModel)]="page_name" name="page_name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+            <div class="mb-4">
+              <label for="pageUrl" class="block text-sm font-medium text-gray-700">Page URL</label>
+              <input type="text" id="pageUrl" [(ngModel)]="page_url" name="page_url" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+            <div class="mb-4">
+              <label for="stepOrder" class="block text-sm font-medium text-gray-700">Step Order</label>
+              <input type="number" id="stepOrder" [(ngModel)]="step_order" name="step_order" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+            <div class="mb-4">
+              <label for="elementId" class="block text-sm font-medium text-gray-700">Element ID</label>
+              <input type="text" id="elementId" [(ngModel)]="element_id" name="element_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+            <div class="mb-4">
+              <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+              <input type="text" id="title" [(ngModel)]="title" name="title" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+            <div class="mb-4">
+              <label for="content" class="block text-sm font-medium text-gray-700">Content</label>
+              <textarea id="content" [(ngModel)]="content" name="content" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required></textarea>
+            </div>
+            <div class="mb-4">
+              <label for="placement" class="block text-sm font-medium text-gray-700">Placement</label>
+              <input type="text" id="placement" [(ngModel)]="placement" name="placement" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+            <div class="mb-4">
+              <label for="buttons" class="block text-sm font-medium text-gray-700">Buttons</label>
+              <input type="text" id="buttons" [(ngModel)]="buttons" name="buttons" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+            <div class="flex justify-end space-x-3">
+              <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600" (click)="closeModalAdd()">Submit</button>
+              <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded shadow-md hover:bg-gray-600" (click)="closeModalAdd()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+<!-- Modal Edit -->
+<div
+  class="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+  *ngIf="isModalEditOpen">
+  <div class="bg-white p-6 rounded-lg w-full max-w-lg mx-auto relative max-h-[90vh] overflow-y-auto">
+    <!-- Close Button -->
+    <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" (click)="closeModalEdit()">
+      &times;
+    </button>
+
+    <h2 class="text-2xl font-bold mb-4">Edit Tour</h2>
+
+    <form (ngSubmit)="updateTour()">
+      <!-- Form Inputs -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Tour Name</label>
+        <input type="text" [(ngModel)]="tour_name" name="tour_name" class="mt-1 block w-full px-3 py-2 border rounded" required>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Page URL</label>
+        <input type="text" [(ngModel)]="page_url" name="page_url" class="mt-1 block w-full px-3 py-2 border rounded" required>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Page Name</label>
+        <input type="text" [(ngModel)]="page_name" name="page_name" class="mt-1 block w-full px-3 py-2 border rounded" required>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Step Order</label>
+        <input type="text" [(ngModel)]="step_order" name="step_order" class="mt-1 block w-full px-3 py-2 border rounded" required>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Element ID</label>
+        <input type="text" [(ngModel)]="element_id" name="element_id" class="mt-1 block w-full px-3 py-2 border rounded" required>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Title</label>
+        <input type="text" [(ngModel)]="title" name="title" class="mt-1 block w-full px-3 py-2 border rounded" required>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Content</label>
+        <textarea [(ngModel)]="content" name="content" class="mt-1 block w-full px-3 py-2 border rounded" required></textarea>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Placement</label>
+        <input type="text" [(ngModel)]="placement" name="placement" class="mt-1 block w-full px-3 py-2 border rounded" required>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Buttons</label>
+        <input type="text" [(ngModel)]="buttons" name="buttons" class="mt-1 block w-full px-3 py-2 border rounded" required>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" (click)="closeModalEdit()" class="bg-green-500 text-white px-4 py-2 rounded mt-4 w-full">
+        Update Tour
+      </button>
+    </form>
+  </div>
+</div>
