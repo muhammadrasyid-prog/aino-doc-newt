@@ -150,29 +150,29 @@
                 <span *ngIf="role_code === 'A'">Berisi dokumen yang dibuat oleh Anda dan orang yang satu divisi dengan
                   Anda. Hanya Anda yang dapat mengakses dokumen ini!</span>
               </p>
-              <div class="flex flex-col overflow-y-scroll h-[68vh]">
-                <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+              <div class="flex flex-col overflow-y-scroll h-[80vh]">
+                <table matSort class="w-full text-sm text-left rtl:text-right text-gray-500">
                   <thead class="sticky top-0 text-xs text-gray-700 uppercase bg-gray-50 z-10">
                     <tr>
                       <th scope="col" class="px-6 py-3">No.</th>
-                      <th scope="col" class="px-6 py-3">No. Formulir</th>
-                      <th scope="col" class="px-6 py-3">No. Ticket</th>
-                      <th scope="col" class="px-6 py-3">Dokumen</th>
-                      <th scope="col" class="px-6 py-3">No. DA</th>
-                      <th scope="col" class="px-6 py-3">Projek</th>
-                      <th scope="col" class="px-6 py-3">Manajer</th>
-                      <th scope="col" class="px-6 py-3">Approval Status</th>
-                      <th scope="col" class="px-6 py-3">Status</th>
+                      <th mat-sort-header="form_number" scope="col" class="px-6 py-3">No. Formulir</th>
+                      <th mat-sort-header="form_ticket" scope="col" class="px-6 py-3">No. Ticket</th>
+                      <th mat-sort-header="document_name" scope="col" class="px-6 py-3">Dokumen</th>
+                      <th mat-sort-header="no_da" scope="col" class="px-6 py-3">No. DA</th>
+                      <th mat-sort-header="project_name" scope="col" class="px-6 py-3">Projek</th>
+                      <th mat-sort-header="project_manager" scope="col" class="px-6 py-3">Manajer</th>
+                      <th mat-sort-header="approval_status" scope="col" class="px-6 py-3">Approval Status</th>
+                      <th mat-sort-header="form_status" scope="col" class="px-6 py-3">Status</th>
                       <th scope="col" class="px-6 py-3">Action</th>
                     </tr>
                   </thead>
                   <tbody>
 
                     <ng-container *ngIf="role_code === 'SA'">
-                      <tr *ngFor="let itemFormITCM of dataListFormITCM let x = index"
+                      <tr *ngFor="let itemFormITCM of dataListFormITCM | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPg }; let x = index"
                         class="bg-white border-b hover:bg-gray-50">
                         <ng-container *ngIf="matchesSearch(itemFormITCM)">
-                          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ x+1 }}</th>
+                          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ (currentPg - 1) *itemsPerPage + x + 1 }}</th>
                           <td class="px-6 py-4">
                             {{ itemFormITCM.form_number }}
                             <p class="text-xs">by {{ itemFormITCM.created_by }}</p>
@@ -201,10 +201,10 @@
                     </ng-container>
 
                     <ng-container *ngIf="role_code === 'A'">
-                      <tr *ngFor="let itemFormITCM of dataListFormAdminITCM let x = index"
+                      <tr *ngFor="let itemFormITCM of dataListFormAdminITCM | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPg }; let x = index"
                         class="bg-white border-b hover:bg-gray-50">
                         <ng-container *ngIf="matchesSearch(itemFormITCM)">
-                          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ x+1 }}</th>
+                          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ (currentPg - 1) *itemsPerPage + x + 1 }}</th>
                           <td class="px-6 py-4">
                             {{ itemFormITCM.form_number }}
                             <p class="text-xs">by {{ itemFormITCM.created_by }}</p>
@@ -323,10 +323,10 @@
                     </ng-container>
 
                     <ng-container *ngIf="role_code === 'M'">
-                      <tr *ngFor="let itemFormITCM of dataListFormUserITCM let x = index"
+                      <tr *ngFor="let itemFormITCM of dataListFormUserITCM | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPg }; let x = index"
                         class="bg-white border-b hover:bg-gray-50">
                         <ng-container *ngIf="matchesSearch(itemFormITCM)">
-                          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ x+1 }}</th>
+                          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ (currentPg - 1) *itemsPerPage + x + 1 }}</th>
                           <td class="px-6 py-4">
                             {{ itemFormITCM.form_number }}
                             <p class="text-xs">by {{ itemFormITCM.created_by }}</p>
@@ -446,6 +446,42 @@
                   </tbody>
                 </table>
               </div>
+              <div class="mt-4 mx-1 md:mx-4 flex items-center text-sm font-medium text-gray-600">
+                <div class="flex items-center gap-3">
+                  <label 
+                    for="itemsPerPage" 
+                    class="text-sm font-medium text-gray-700"
+                  >
+                    Items per page:
+                  </label>
+                  
+                  <select 
+                    id="itemsPerPage" 
+                    [(ngModel)]="displayItemsPerPage" 
+                    (change)="onItemsPerPageChange()"
+                    class="block w-24 rounded-md border-gray-300 py-1.5 pl-1 md:pl-3 pr-8 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white shadow-sm"
+                  >
+                    <option 
+                      *ngFor="let size of tableSize" 
+                      [value]="size"
+                      class="text-sm"
+                    >
+                      {{ size }}
+                    </option>
+                  </select>
+                </div>
+                <div class="ml-auto">
+                <p>
+                  Results: {{ (currentPg - 1) * itemsPerPage + 1 }} -
+                  {{ (currentPg * itemsPerPage > totalItems ? totalItems : currentPg * itemsPerPage) }}
+                  of {{ totalItems }}
+                </p></div>
+              </div>
+              <div class="mt-2 py-5 flex justify-center items-center">
+                <pagination-controls class="custom-pagination" (pageChange)="currentPg = $event" [maxSize]="5" [autoHide]="true"
+                  [previousLabel]="''" [nextLabel]="''">
+                </pagination-controls>
+              </div>
             </div>
 
             <!-- my draft -->
@@ -459,7 +495,7 @@
                   setelah dipublikasikan, dokumen hanya dapat diakses dan tidak dapat diubah atau dibatalkan
                   lagi.</span>
               </p>
-              <div class="flex flex-col overflow-y-scroll h-[68vh]">
+              <div class="flex flex-col overflow-y-scroll h-[80vh]">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500">
                   <thead class="sticky top-0 text-xs text-gray-700 uppercase bg-gray-50 z-10">
                     <tr>
@@ -751,7 +787,7 @@
                   Dokumen akan muncul di halaman Anda dan Anda dapat menandatanganinya. Namun, persetujuan akhir hanya
                   dapat dilakukan oleh atasan penerima.</span>
               </p>
-              <div class="flex flex-col overflow-y-scroll h-[68vh]">
+              <div class="flex flex-col overflow-y-scroll h-[80vh]">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500">
                   <thead class="sticky top-0 text-xs text-gray-700 uppercase bg-gray-50 z-10">
                     <tr>

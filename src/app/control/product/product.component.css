@@ -1,0 +1,116 @@
+::ng-deep .ngx-pagination {
+    display: flex !important;
+    gap: 0.5rem;
+    align-items: center !important; 
+    justify-content: center !important;
+    text-align: center;
+    /* tex */
+    background-color: #eeeef0;
+    padding: 5px;
+    border-radius: 50px !important;
+}
+
+::ng-deep .ngx-pagination li {
+    width: 2.5rem;  /* Ukuran tetap untuk tombol */
+    height: 2.5rem;  /* Ukuran tetap untuk tombol */
+    border-radius: 50px  !important;  /* Membuat tombol bulat */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(243 244 246); /* bg-gray-100 untuk tombol */
+}
+
+::ng-deep .ngx-pagination .ngx-pagination-prev,
+::ng-deep .ngx-pagination .ngx-pagination-next {
+    width: 2.5rem;  /* Ukuran tetap untuk tombol Next dan Previous */
+    height: 2.5rem;  /* Ukuran tetap untuk tombol Next dan Previous */
+    border-radius: 50%;  /* Rounded 100% untuk tombol Next dan Previous */
+    background-color: rgb(99 102 241); /* bg-indigo-500 untuk Next dan Previous */
+    color: white;
+    display: flex !important;
+    align-items: center !important; 
+    justify-content: center !important;
+    font-size: 11rem !important;
+}
+
+::ng-deep .ngx-pagination .ngx-pagination-prev:hover,
+::ng-deep .ngx-pagination .ngx-pagination-next:hover {
+    background-color: rgb(67 56 202); /* bg-indigo-600 untuk hover */
+}
+
+::ng-deep .ngx-pagination li.current {
+    background-color: rgb(99 102 241); /* bg-indigo-500 untuk halaman aktif */
+    color: white;
+}
+
+::ng-deep .ngx-pagination li:hover:not(.current) {
+    background-color: rgb(229 231 235);
+    display: flex !important;
+    align-items: center !important; 
+    justify-content: center !important; /* hover:bg-gray-200 untuk tombol yang bukan aktif */
+}
+
+::ng-deep .ngx-pagination a {
+    padding: 0;
+    margin: 0;
+    color: rgb(107 114 128); /* Text warna untuk angka */
+    display: flex !important;
+    align-items: center !important; 
+    justify-content: center !important;
+    background-color: inherit;  /* Menggunakan background dari li */
+    border-radius: 50px  !important;  /* Rounded 100% untuk angka */
+    width: 100%;  /* Pastikan a mengambil lebar penuh */
+    height: 100%;  /* Pastikan a mengambil tinggi penuh */
+    font-size: 1rem;
+}
+
+/* Hover untuk tombol angka */
+::ng-deep .ngx-pagination li a:hover {
+    background-color: rgb(229 231 235); /* Sedikit lebih gelap saat hover */
+}
+
+/* Untuk tombol yang disabled */
+::ng-deep .ngx-pagination .disabled {
+    opacity: 0.7;  /* Membuat tombol yang non-aktif lebih transparan */
+    display: flex !important;
+    align-items: center !important; 
+    justify-content: center !important;
+}
+
+/* Menghilangkan border dan style default */
+::ng-deep .ngx-pagination li::before,
+::ng-deep .ngx-pagination li::after {
+    display: none;
+}
+
+::ng-deep .ngx-pagination a:hover {
+    background: transparent;
+}
+
+::ng-deep .ngx-pagination .pagination-previous a::before {
+  content: '⮜' !important; /* Menambahkan panah kiri untuk Previous */
+  display: flex !important;
+  align-items: center !important; 
+  justify-content: center !important;
+}
+
+::ng-deep .ngx-pagination .pagination-next a::after {
+  content: '⮞' !important; /* Menambahkan panah kanan untuk Next */
+  display: flex !important;
+  align-items: center !important; 
+  justify-content: center !important;
+}
+
+::ng-deep .ngx-pagination .pagination-previous.disabled::before {
+  content: '⮜' !important; /* Menambahkan panah kiri untuk Previous */
+  display: flex !important;
+  align-items: center !important; 
+  justify-content: center !important;
+}
+
+::ng-deep .ngx-pagination .pagination-next.disabled::after {
+  content: '⮞' !important; /* Menambahkan panah kanan untuk Next */
+  display: flex !important;
+  align-items: center !important; 
+  justify-content: center !important;
+}

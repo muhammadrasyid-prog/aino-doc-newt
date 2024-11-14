@@ -1,11 +1,12 @@
 <!-- full.component.html -->
+<app-loader [isLoading]="isLoading"></app-loader>
 <div>
   <app-sidebar class="absolute top-0 left-0 z-20 text-3xl"></app-sidebar>
   <div class="h-screen overflow-y-auto">
     <app-header class="sticky top-0 left-0 z-20"></app-header>
-    <div class="px-5 py-2 md:pl-64 md:pr-4 md:py-3">
+    <div class="px-5 py-2 pb-10 md:pl-64 md:pr-4 md:py-3">
+      <app-breadcrumb></app-breadcrumb>
       <router-outlet></router-outlet>
     </div>
-    <div class="h-8 w-full bg-gradient-to-b from-white via-blue-50 to-blue-100"></div>
   </div>
 </div>

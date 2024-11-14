@@ -14,6 +14,9 @@ import { UserService } from '../../services/user-control/user-control.service';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { Router, RouterLink, RouterModule } from '@angular/router';
+// import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+// import {MatPaginatorModule} from '@angular/material/paginator';
+// import { PageEvent } from '@angular/material/paginator'; 
 // import { FormModule } from '@coreui/angular';
 import { routes } from '../../app.routes';
 
@@ -55,7 +58,7 @@ interface Division {
 @Component({
   selector: 'app-user-control',
   standalone: true,
-  imports: [CommonModule, FormsModule, ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './user-control.component.html',
   styleUrls: ['./user-control.component.css'],
 })

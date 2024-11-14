@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 interface Product {
   product_uuid: string;
@@ -23,13 +24,16 @@ interface Product {
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgxPaginationModule],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css',
 })
 export class ProductComponent implements OnInit {
   
   popoverIndex: number | null = null;
+  currentPg: number = 1;
+  itemsPerPage: number = 2;
+  tableSize: number[] = [5, 10, 15, 20];
   
   searchText: string = '';
 
@@ -59,7 +63,7 @@ export class ProductComponent implements OnInit {
     this.apiUrl = apiUrl;
   }
 
-  dataListProduct: any[] = [];
+  dataListProduct: Product[] = [];
 
   ngOnInit(): void {
     this.fetchDataProduct();
@@ -100,6 +104,17 @@ export class ProductComponent implements OnInit {
       .then((response) => {
         this.dataListProduct = response.data;
         this.productService.updateDataListProduct(this.dataListProduct);
+             // Jika ingin menampilkan atau memantau data di komponen
+        this.productService.dataListProduct$.subscribe(
+          (data) => {
+            console.log('Data diperbarui:', data);
+            // Jika ingin menyimpan hasil ke variabel di komponen
+            this.dataListProduct = data;
+          },
+          (error) => {
+            console.error('Error saat berlangganan data:', error);
+          }
+        );
       })
       .catch((error) => {
         if (error.response.status === 500) {

@@ -10,17 +10,18 @@
           clip-rule="evenodd"></path>
       </svg>
     </div>
-    <input type="text" id="table-search"  [(ngModel)]="searchText" name="searchText"
-      class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg lg:w-80 md:w-64 sm:w-40 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-      placeholder="Search for items">
+    <input type="text" id="table-search" [(ngModel)]="searchText" name="searchText"
+    (input)="currentPg = 1"
+    class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg lg:w-80 md:w-64 sm:w-40 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+    placeholder="Search for items">
   </div>
   <button type="button" (click)="openAddModal()" *ngIf="role_code === 'SA'"
     class="ml-auto text-white bg-[#1da1f2] hover:bg-[#1da1f2]/90 focus:ring-4 focus:outline-none focus:ring-[#1da1f2]/50 font-medium rounded-lg text-sm px-2 py-1 md:px-5 md:py-2.5 text-center inline-flex items-center">
     Add Product
   </button>
 </div>
-<div class="relative py-2 overflow-x-auto shadow-md sm:rounded-lg">
-  <div class="flex flex-col overflow-y-scroll h-[68vh]">
+<div class="relative py-2 overflow-x-auto ">
+  <div class="flex flex-col overflow-y-scroll h-[68vh] shadow-md sm:rounded-lg">
     <table class="w-full text-sm text-left rtl:text-right text-gray-500">
       <thead class="sticky top-0 text-xs text-gray-700 uppercase bg-gray-50">
         <tr>
@@ -31,10 +32,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let itemProduct of (productService.dataListProduct$ | async) let x = index"
+        <tr
+          *ngFor="let itemProduct of ((productService.dataListProduct$ | async) || []) | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPg }; let x = index"
           class="bg-white border-b hover:bg-gray-50">
           <ng-container *ngIf="matchesSearch(itemProduct)">
-            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ x + 1 }}</th>
+            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ (currentPg - 1) *
+              itemsPerPage + x + 1 }}</th>
             <td class="px-6 py-4">{{ itemProduct.product_name }}</td>
             <td class="px-6 py-4">{{ itemProduct.product_owner }}</td>
             <!-- Button Popover -->
@@ -91,8 +94,25 @@
       </tbody>
     </table>
   </div>
+
+  <div class="mt-8 py-5 flex justify-center items-center">
+    <pagination-controls 
+    class="custom-pagination" (pageChange)="currentPg = $event" [maxSize]="5" [autoHide]="true" [previousLabel]="''"
+      [nextLabel]="''">
+    </pagination-controls>
+  </div>
 </div>
 
+<!-- <div>
+  <div>dropdown</div>
+  <div>menampilkan 5 dari 290</div>
+</div> -->
+<!-- <pagination-controls (pageChange)="currentPg = $event"></pagination-controls> -->
+<!-- <div class="w-full py-8 flex justify-center border border-red-500">
+  <pagination-controls (pageChange)="currentPg = $event" [maxSize]="5" [autoHide]="true" [previousLabel]="'Previous'"
+    [nextLabel]="'Next'">
+  </pagination-controls>
+</div> -->
 
 <!-- ADD MODAL -->
 <div *ngIf="isModalAddOpen" tabindex="-1" aria-hidden="true"
@@ -120,8 +140,8 @@
 
       <div class="mt-4">
         <label for="productName" class="text-sm md:text-base">Nama Produk</label>
-        <input type="text" id="productName" name="product_name" placeholder="Masukkan kode Produk" [(ngModel)]="product_name"
-          name="product_name" required class="border rounded-xl p-2 w-full  ">
+        <input type="text" id="productName" name="product_name" placeholder="Masukkan kode Produk"
+          [(ngModel)]="product_name" name="product_name" required class="border rounded-xl p-2 w-full  ">
       </div>
 
       <div class="mt-4">
@@ -168,8 +188,8 @@
 
       <div class="mt-4">
         <label for="productName" class="text-sm md:text-base">Nama Produk</label>
-        <input type="text" id="productName" name="product_name" placeholder="Masukkan kode Produk" [(ngModel)]="product_name"
-          name="product_name" required class="border rounded-xl p-2 w-full  ">
+        <input type="text" id="productName" name="product_name" placeholder="Masukkan kode Produk"
+          [(ngModel)]="product_name" name="product_name" required class="border rounded-xl p-2 w-full  ">
       </div>
 
       <div class="mt-4">

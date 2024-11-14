@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ChangeDetectorRef, ViewChild, AfterViewInit } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -14,6 +14,9 @@ import Swal from 'sweetalert2';
 import { FormItcmService } from '../../services/form-itcm/form-itcm.service';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 
 interface Signatory {
   sign_uuid: string;
@@ -58,12 +61,18 @@ interface Projects {
 @Component({
   selector: 'app-form-itcm',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgxPaginationModule, MatTableModule, MatSortModule],
   templateUrl: './form-itcm.component.html',
-  styleUrls: ['./form-itcm.component.scss'],
+  styleUrls: ['./form-itcm.component.css'],
 })
-export class FormItcmComponent implements OnInit {
+export class FormItcmComponent implements OnInit, AfterViewInit {
+  currentPg: number = 1;
+  displayItemsPerPage: string = '10';
+  itemsPerPage: number = 10;
+  tableSize: any[] = ['10', '20', '50', 'Show All'];
+  
   searchText: string = '';
+  totalItems: number = 0;
 
   isPreview: boolean = false; // State untuk menampilkan preview atau tabel
   form!: FormGroup;
@@ -155,12 +164,21 @@ export class FormItcmComponent implements OnInit {
     'Atasan Penerima': { name: '', position: '', is_sign: false },
   };
 
+  totalMyDocument: number = 0;
+  totalDraft: number = 0;
+  totalMySignature: number = 0;
+  totalApproved: number = 0;
+  totalRejected: number = 0;
+
+  totaljawa: number = 0;
+
   constructor(
     private cookieService: CookieService,
     private fb: FormBuilder,
     public formItcmService: FormItcmService,
     private route: ActivatedRoute,
     private router: Router,
+    private cdRef: ChangeDetectorRef,
     @Inject('apiUrl') private apiUrl: string
   ) {
     this.apiUrl = apiUrl;
@@ -169,9 +187,9 @@ export class FormItcmComponent implements OnInit {
   dataListDocument: Documents[] = [];
   dataListProject: Projects[] = [];
 
-  dataListFormITCM: formsITCM[] = [];
-  dataListFormAdminITCM: formsITCM[] = [];
-  dataListFormUserITCM: formsITCM[] = [];
+  dataListFormITCM: formsITCM[] = []; // Data list SuperAdmin
+  dataListFormAdminITCM: formsITCM[] = []; // Data list Admin
+  dataListFormUserITCM: formsITCM[] = []; // Data list UserMember
 
   // draft
   dataListAdminFormITCMDraft: formsITCM[] = [];
@@ -191,11 +209,26 @@ export class FormItcmComponent implements OnInit {
   dataListAdminFormITCMRejected: formsITCM[] = [];
   dataListUserFormITCMRejected: formsITCM[] = [];
 
-  ngOnInit(): void {
-    this.fetchDataFormITCM();
-    this.fetchDataAdminFormITCM();
-    this.fetchDataUserFormITCM();
-    this.profileData();
+  dataSource = new MatTableDataSource(this.dataListFormAdminITCM);
+  
+  @ViewChild(MatSort) sort!: MatSort;
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+  }
+
+  async ngOnInit(): Promise<void> {
+    await this.profileData();
+    if (this.role_code === 'SA') {
+      this.superAdminOnly();
+      console.log('superadmin woi');
+    } else if (this.role_code === 'A') {
+      this.adminOnly();
+      console.log('admin woi');
+    } else if (this.role_code === 'M') {
+      this.userOnly();
+      console.log('member woi');
+    }
 
     this.fetchAllUser();
     this.fetchAllDocument();
@@ -204,24 +237,38 @@ export class FormItcmComponent implements OnInit {
 
     this.fetchUserSignature();
 
-    // draft
-    this.fetchDataAdminFormITCMDraft();
-    this.fetchDataUserFormITCMDraft();
-
-    // approve
-    this.fetchDataAdminFormITCMApproved();
-    this.fetchDataUserFormITCMApproved();
-
-    // rejected
-    this.fetchDataAdminFormITCMRejected();
-    this.fetchDataUserFormITCMRejected();
-
     this.route.paramMap.subscribe((params) => {
       const form_uuid = params.get('form_uuid');
       if (form_uuid) {
-        this.openPreviewPage(form_uuid); // Panggil fungsi dengan UUID dari URL
+        this.openPreviewPage(form_uuid);
       }
     });
+
+    console.log('role code:', this.role_code);
+  }
+
+  superAdminOnly() {
+    this.fetchDataFormITCM();
+  }
+
+  async adminOnly() {
+    await Promise.all([
+      this.fetchDataAdminFormITCM(),
+      this.fetchDataAdminFormITCMDraft(),
+      this.fetchDataAdminFormITCMApproved(),
+      this.fetchDataAdminFormITCMRejected()
+    ]);
+  }
+
+
+  userOnly() {
+    this.fetchDataUserFormITCM();
+    // draft
+    this.fetchDataUserFormITCMDraft();
+    // approve
+    this.fetchDataUserFormITCMApproved();
+    // rejected
+    this.fetchDataUserFormITCMRejected();
   }
 
   matchesSearch(item: formsITCM): boolean {
@@ -241,27 +288,70 @@ export class FormItcmComponent implements OnInit {
     );
   }
 
-  profileData(): void {
+  async profileData(): Promise<void> {
     const token = this.cookieService.get('userToken');
-
-    axios
-      .get(`${this.apiUrl}/auth/my/profile`, {
+  
+    if (!token) {
+      console.error('Token tidak ditemukan. Harap periksa apakah Anda telah login.');
+      return;
+    }
+  
+    try {
+      const response = await axios.get(`${this.apiUrl}/auth/my/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      .then((response) => {
-        console.log(response);
-        this.user_uuid = response.data.user_uuid;
-        this.user_name = response.data.user_name;
-        this.role_code = response.data.role_code;
-        this.personal_name = response.data.personal_name;
-      })
-      .catch((error) => {
-        console.log(error);
       });
+      this.user_uuid = response.data.user_uuid;
+      this.user_name = response.data.user_name;
+      this.role_code = response.data.role_code;
+      this.personal_name = response.data.personal_name;
+      console.log('Nama pribadi:', this.personal_name);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error('Kesalahan respons API:', error.response.data);
+          console.error('Status kode:', error.response.status);
+        } else if (error.request) {
+          console.error('Permintaan dibuat tetapi tidak ada respons:', error.request);
+        } else {
+          console.error('Kesalahan pengaturan permintaan:', error.message);
+        }
+      } else {
+        console.error('Kesalahan tidak terduga:', error);
+      }
+    }
   }
 
+  onItemsPerPageChange(): void {
+    // Simpan nilai display
+    this.displayItemsPerPage = this.tableSize.find(size => size === this.displayItemsPerPage) || '10';
+  
+    // Set itemsPerPage berdasarkan pilihan
+    if (this.displayItemsPerPage === 'Show All') {
+      this.itemsPerPage = this.totalItems;
+    } else {
+      this.itemsPerPage = Number(this.displayItemsPerPage);
+    }
+  
+    // Reset page
+    this.currentPg = 1;
+    
+    // Update view
+    if (this.role_code === 'SA') {
+      this.superAdminOnly();
+      console.log('superadmin woi');
+    } else if (this.role_code === 'A') {
+      this.adminOnly();
+      console.log('admin woi');
+    } else if (this.role_code === 'M') {
+      this.userOnly();
+      console.log('member woi');
+    }
+    this.cdRef.detectChanges();
+  }
+  
+  
   fetchDataFormITCM() {
     axios
       .get(`${environment.apiUrl2}/form/itcm`)
@@ -269,6 +359,19 @@ export class FormItcmComponent implements OnInit {
         this.dataListFormITCM = response.data;
         console.log(response.data);
         this.formItcmService.updateDataListFormITCM(this.dataListFormITCM);
+        this.totalItems = this.dataListFormITCM.length;
+        console.log('totalItems SA', this.totalItems);
+        this.formItcmService.dataListFormITCM$.subscribe(
+          (data) => {
+            console.log('Data diperbarui:', data);
+            // Jika ingin menyimpan hasil ke variabel di komponen
+            this.dataListFormITCM = data;
+            // this.totalItemsFunc();
+          },
+          (error) => {
+            console.error('Error saat berlangganan data:', error);
+          }
+        );
       })
       .catch((error) => {
         if (error.response.status === 500) {
@@ -289,6 +392,19 @@ export class FormItcmComponent implements OnInit {
       .then((response) => {
         this.dataListFormAdminITCM = response.data;
         console.log('ini', response.data);
+        this.formItcmService.updateDataListFormAdmin(this.dataListFormAdminITCM);
+        this.totalItems = this.dataListFormAdminITCM.length;
+        console.log('totalItems A', this.totalItems);
+        this.formItcmService.dataListFormAdmin$.subscribe(
+          (data) => {
+            console.log('Data diperbarui:', data);
+            // Jika ingin menyimpan hasil ke variabel di komponen
+            this.dataListFormAdminITCM = data;
+          },
+          (error) => {
+            console.error('Error saat berlangganan data:', error);
+          }
+        )
       })
       .catch((error) => {
         console.log(error.response);
@@ -304,12 +420,38 @@ export class FormItcmComponent implements OnInit {
       })
       .then((response) => {
         this.dataListFormUserITCM = response.data;
+        this.totalItems = this.dataListFormUserITCM.length;
+        console.log('totalItems M', this.totalItems);
         console.log(response.data);
+        this.formItcmService.dataListFormUser$.subscribe(
+          (data) => {
+            console.log('Data diperbarui:', data);
+            // Jika ingin menyimpan hasil ke variabel di komponen
+            this.dataListFormAdminITCM = data;
+          },
+          (error) => {
+            console.error('Error saat berlangganan data:', error);
+          }
+        )
       })
       .catch((error) => {
         console.log(error.response);
       });
   }
+
+  // totalItemsFunc() {
+  //   if (this.role_code === 'SA') {
+  //     this.totalItems = this.dataListFormITCM.length;
+  //     console.log('totalItems', this.totalItems);
+  //     console.log('Data list:', this.dataListFormITCM); // Tambahkan ini untuk memeriksa data
+  //   } else if (this.role_code === 'A') {
+  //     this.totalItems = this.dataListFormAdminITCM.length;
+  //     console.log('totalItems', this.totalItems);
+  //   } else if (this.role_code === 'M') {
+  //     this.totalItems = this.dataListFormUserITCM.length;
+  //     console.log('totalItems', this.totalItems);
+  //   }
+  // }  
 
   fetchDocumentUUID(): void {
     axios

@@ -1,0 +1,121 @@
+::ng-deep .ngx-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px; /* Tambahkan gap untuk spacing antar item */
+}
+
+::ng-deep .ngx-pagination li {
+    width: 35px;
+    height: 35px;
+    border-radius: 50% !important; /* Ubah ke 50% untuk bentuk bulat sempurna */
+    background: #f8f8f8;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin: 0 3px; /* Tambahkan margin untuk spacing */
+    overflow: hidden; /* Tambahkan overflow hidden */
+}
+
+::ng-deep .ngx-pagination li a,
+::ng-deep .ngx-pagination li span {
+    width: 100%;
+    height: 100%;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50% !important;
+    padding: 0 !important; /* Hapus padding bawaan */
+    margin: 0 !important; /* Hapus margin bawaan */
+}
+
+::ng-deep .ngx-pagination li.small-screen {
+    display: none !important;
+}
+
+::ng-deep .ngx-pagination li.pagination-previous,
+::ng-deep .ngx-pagination li.pagination-next {
+    width: 35px; /* Tetapkan ukuran yang sama */
+    height: 35px;
+    border-radius: 50% !important;
+    overflow: hidden;
+}
+
+::ng-deep .ngx-pagination li.pagination-previous a,
+::ng-deep .ngx-pagination li.pagination-next a,
+::ng-deep .ngx-pagination li.pagination-previous span,
+::ng-deep .ngx-pagination li.pagination-next span {
+    width: 100%;
+    height: 100%;
+    border-radius: 50% !important;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #6f77f0;
+    padding: 0 !important;
+}
+
+/* Tambahkan style untuk active state */
+::ng-deep .ngx-pagination li.current {
+    background: #0195f7;
+    color: white;
+}
+
+/* Optional: Hover effect */
+::ng-deep .ngx-pagination li:hover:not(.current):not(.disabled) {
+    background: #eaeaea;
+}
+
+/* Untuk tombol Previous */
+::ng-deep .ngx-pagination .pagination-previous a::before {
+    content: '<' !important;
+    position: absolute !important; /* Tambahkan ini */
+    left: 0 !important; /* Tambahkan ini */
+    right: 0 !important; /* Tambahkan ini */
+    margin: auto !important; /* Tambahkan ini */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+}
+
+/* Untuk tombol Next */
+::ng-deep .ngx-pagination .pagination-next a::after {
+    content: '>' !important;
+    position: absolute !important; /* Tambahkan ini */
+    left: 0 !important; /* Tambahkan ini */
+    right: 0 !important; /* Tambahkan ini */
+    margin: auto !important; /* Tambahkan ini */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+}
+
+/* Untuk tombol Previous dalam keadaan disabled */
+::ng-deep .ngx-pagination .pagination-previous.disabled::before {
+    content: '<' !important;
+    position: absolute !important; /* Tambahkan ini */
+    left: 0 !important; /* Tambahkan ini */
+    right: 0 !important; /* Tambahkan ini */
+    margin: auto !important; /* Tambahkan ini */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+}
+
+/* Untuk tombol Next dalam keadaan disabled */
+::ng-deep .ngx-pagination .pagination-next.disabled::after {
+    content: '>' !important;
+    position: absolute !important; /* Tambahkan ini */
+    left: 0 !important; /* Tambahkan ini */
+    right: 0 !important; /* Tambahkan ini */
+    margin: auto !important; /* Tambahkan ini */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+}
